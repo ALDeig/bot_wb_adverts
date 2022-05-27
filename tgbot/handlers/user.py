@@ -156,7 +156,6 @@ async def send_my_tracking(msg: Message, db: AsyncSession):
 async def btn_unsubscribe(call: CallbackQuery, db: AsyncSession):
     """Кнопка для отмены отслеживания"""
     await call.answer()
-    await call.message.edit_reply_markup()
     query = call.message.text.split("\n\n")[0].split(":")[1].strip()
     type_query = call.data.split(":")[-1]
     if type_query == "scu":
