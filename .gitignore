@@ -3,4 +3,5 @@ logs/
 systemd/
 *__pycache__
 .env
+README.md
 
