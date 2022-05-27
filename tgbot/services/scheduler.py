@@ -17,7 +17,6 @@ async def task_remove_user_without_subscribe(bot, session_factory):
     """Задача на удаление пользователей без подписки"""
     users = await remove_users_without_subscribe(session_factory)
     for user in users:
-        print(user)
         try:
             await bot.send_message(user, "Ваша подписка закончилась. Для дальнейшего использования нажмите /start")
         except Exception as er:

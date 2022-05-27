@@ -43,8 +43,8 @@ def _group_position_by_price(list_ads_cards: list[AdsCard]) -> dict:
     return result
 
 
-def _create_text_message_by_group_ads_card(prices_with_position: dict[int,list], scu: str) -> str:
-    text = "Карточка с артикулом: " + scu + "\n"
+def _create_text_message_by_group_ads_card(prices_with_position: dict[int,list], scu: int) -> str:
+    text = "Карточка с артикулом: " + str(scu) + "\n"
     for price, position in prices_with_position.items():
         if len(position) > 1:
             text += f"\nПозиции {position[0]}-{position[-1]}: {price}"
