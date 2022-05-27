@@ -110,7 +110,7 @@ async def btn_subscribe_to_update(call: CallbackQuery, db: AsyncSession, state: 
     """Реагирует на кнопку подписки на отслеживание цены"""
     await call.answer()
     text_or_scu = call.message.text.split("\n\n")[0].split(":")[1].strip()
-    type_query = call.data.split(":")[-1]
+    type_query = call.data.split(":")[-1].strip()
     # try:
     #     prices = await wb.get_position_with_price(query.lower())
     # except wb.BadRequestInWB:
@@ -175,8 +175,8 @@ def register_user(dp: Dispatcher):
     dp.register_message_handler(get_search_query, state="get_search_query")
     dp.register_callback_query_handler(btn_check_price_in_card, text="ads_in_card")
     dp.register_message_handler(get_scu_for_get_price, state="get_scu")
-    dp.register_callback_query_handler(btn_unsubscribe, text_contains="unsubscribe", state="*")
-    dp.register_callback_query_handler(btn_subscribe_to_update, text_contains="subscribe", state="*")
+    dp.register_callback_query_handler(btn_unsubscribe, lambda call: call.data.startswith("unsubscribe"), state="*")
+    dp.register_callback_query_handler(btn_subscribe_to_update, lambda call: call.data.startswith("subscribe"), state="*")
     # dp.register_callback_query_handler(select_position_to_update, state="select_position_to_update")
     # dp.register_message_handler(get_count, state="get_count")
     dp.register_message_handler(send_my_tracking, commands=["my_tracking"])

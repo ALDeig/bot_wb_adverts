@@ -90,7 +90,7 @@ async def get_adverts_by_query_search(client: httpx.AsyncClient, query: str) -> 
     try:
         result = result.json()
         positions = result["pages"][0]["positions"]
-    except (KeyError, IndexError, JSONDecodeError):
+    except (KeyError, IndexError, TypeError, JSONDecodeError):
         raise BadRequestInWB
     adverts = _parse_adverts_to_positions(result, positions)
     text = _create_text_message_by_query_search(query, adverts)
