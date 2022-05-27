@@ -119,8 +119,13 @@ async def btn_subscribe_to_update(call: CallbackQuery, db: AsyncSession, state: 
     #     return 
     if type_query == "text":
         await db_queries.add_new_tracking(db, call.from_user.id, query_text=text_or_scu.lower())
-    else:
+    elif type_query == "scu":
         await db_queries.add_new_tracking(db, call.from_user.id, scu=int(text_or_scu))
+    else:
+        await call.message.answer("Не удалось добавить в список отслеживания. Попробуйте повторить запрос и потом \
+                                  добавить в отслежвание")
+        await state.finish()
+        return
     await call.message.edit_text(call.message.text + "\n\nОтслеживается")
     await state.finish()
 
