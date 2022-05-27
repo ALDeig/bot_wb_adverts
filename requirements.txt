@@ -1,0 +1,8 @@
+aiogram
+SQLAlchemy
+pydantic
+python-dotenv
+asyncpg
+loguru
+httpx
+APScheduler
