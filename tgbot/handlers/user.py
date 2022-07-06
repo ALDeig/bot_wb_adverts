@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from tgbot.keyboards import kb_user
 from tgbot.services import db_queries 
 from tgbot.services.wb import wb, common, errors
+from tgbot.services.wb.ads_by_query import get_adverts
 from tgbot.services.texts import Texts
 
 
@@ -62,14 +63,17 @@ async def btn_check_price_in_search(call: CallbackQuery, db: AsyncSession, state
 
 async def get_search_query(msg: Message, state: FSMContext):
     """Получает поисковый запрос для проверки цены на рекламу"""
-    try:
-        headers = common.get_headers()
-        async with AsyncClient(headers=headers, timeout=common.TIMEOUT) as client:
-            result = await wb.get_adverts_by_query_search(client, msg.text.lower())
-    except errors.BadRequestInWB:
-        await msg.answer("Не удалось обработать запрос. Возможно неверный поисковый запрос")
-        await state.finish()
-        return
+    await state.finish()
+    result = await get_adverts(msg.text.lower())
+    # old code
+    # try:
+    #     headers = common.get_headers()
+    #     async with AsyncClient(headers=headers, timeout=common.TIMEOUT) as client:
+    #         result = await wb.get_adverts_by_query_search(client, msg.text.lower())
+    # except errors.BadRequestInWB:
+    #     await msg.answer("Не удалось обработать запрос. Возможно неверный поисковый запрос")
+    #     await state.finish()
+    #     return
     kb = kb_user.subscribe_to_update_price("text")
     # text_positions = "\n".join(f"{price.position} - {price.price} руб." for price in prices)
     # text = f"Ваш запрос: <b>{msg.text}</b>\n\nПозиции и цена:\n<u>{text_positions}</u>" 

@@ -57,7 +57,7 @@ async def set_commands(dp: Dispatcher):
 
 
 async def main():
-    setup_logger("INFO")
+    # setup_logger("INFO")
     config = Settings()
     database_url = f"postgresql+asyncpg://{config.db.user}:{config.db.password}@{config.db.host}/{config.db.name}"
 
@@ -96,6 +96,7 @@ async def main():
 
 
 if __name__ == '__main__':
+    setup_logger("INFO")
     try:
         asyncio.run(main())
     except (KeyboardInterrupt, SystemExit):
