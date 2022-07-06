@@ -3,14 +3,16 @@ from typing import NamedTuple
 
 import httpx
 
+from tgbot.services.wb.common import get_headers, TIMEOUT
+
  
-HEADERS = {
-    "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
-    "accept-encoding": "gzip, deflate, br",
-    "accept-language": "ru-RU,ru;q=0.9,en-GB;q=0.8,en-US;q=0.7,en;q=0.6",
-    "dnt": "1",
-    "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36"
-}
+# HEADERS = {
+#     "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
+#     "accept-encoding": "gzip, deflate, br",
+#     "accept-language": "ru-RU,ru;q=0.9,en-GB;q=0.8,en-US;q=0.7,en;q=0.6",
+#     "dnt": "1",
+#     "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36"
+# }
 
 
 class Advert(NamedTuple):
@@ -25,7 +27,6 @@ from pathlib import Path
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
-# from selenium.common.exceptions import NoSuchElementException
 
 options = webdriver.ChromeOptions()
 options.add_argument("user-agent=Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:84.0) Gecko/20100101 Firefox/84.0")
@@ -80,23 +81,13 @@ class SearchEngineAdvert:
         # return result_from_first_page, result_from_second_page
 
     async def _get_list_all_adverts(self):
-        parse_query = urllib.parse.quote(self._query)
-        headers = {
-            "accept": "*/*",
-            "accept-encoding": "gzip, deflate, br",
-            "accept-language": "ru-RU,ru;q=0.9",
-            "cache-control": "no-cache",
-            "origin": "https://www.wildberries.ru",
-            "pragma": "no-cache",
-            "dnt": "1",
-            "referer": f"https://www.wildberries.ru/catalog/0/search.aspx?search={parse_query}",
-            "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36"
-        }
+        # headers = get_headers()
         async with httpx.AsyncClient() as client:
             response = await client.get(
                 "https://catalog-ads.wildberries.ru/api/v5/search",
-                headers=headers,
-                params={"keyword": self._query}
+                # headers=headers,
+                params={"keyword": self._query},
+                timeout=TIMEOUT
             )
             data = response.json()
             return data.get("adverts"), data.get("pages")
