@@ -1,32 +1,17 @@
 import urllib.parse
 from typing import NamedTuple
+from pathlib import Path
 
-import httpx
-
-from tgbot.services.wb.common import get_headers, TIMEOUT
-
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.common.by import By
  
-# HEADERS = {
-#     "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
-#     "accept-encoding": "gzip, deflate, br",
-#     "accept-language": "ru-RU,ru;q=0.9,en-GB;q=0.8,en-US;q=0.7,en;q=0.6",
-#     "dnt": "1",
-#     "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36"
-# }
-
-
 class Advert(NamedTuple):
     position: int
     card_id: int
     cpm: int
 
 
-# test
-from pathlib import Path
-
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.common.by import By
 
 options = webdriver.ChromeOptions()
 options.add_argument("user-agent=Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:84.0) Gecko/20100101 Firefox/84.0")
@@ -43,35 +28,35 @@ class SelectedCard:
     def __init__(self, query):
         s = Service(executable_path=path_to_chromedriver)
         self.driver = webdriver.Chrome(service=s, options=options)
-        self.query=urllib.parse.quote(query)
+        self._query=urllib.parse.quote(query)
 
-    def get_card_id_selected_card(self) -> tuple[list, list]:
-        self.driver.get(f"https://www.wildberries.ru/catalog/0/search.aspx?sort=popular&search={self.query}")
+    def get_card_id_selected_card(self) -> list:
+        self.driver.get(f"https://www.wildberries.ru/catalog/0/search.aspx?sort=popular&search={self._query}")
         self.driver.implicitly_wait(5)
         cards = self.driver.find_elements(By.CSS_SELECTOR, ".advert-card-item")
         result = []
         for card in cards:
             result.append(card.get_attribute("data-popup-nm-id"))
         self.driver.close()
-        return result, []
-# end test
+        return result
 
 
 class SearchEngineAdvert:
-    def __init__(self, query: str):
-        self._query = self._format_query(query)
+    def __init__(self, query: str, list_all_adverts: list, positions: list):
+        self._list_all_adverts = list_all_adverts
+        self._positions = positions
+        self._query = query
 
-    async def get_adverts_card(self) -> tuple[list[Advert], list[Advert]]:
-        ads_cards = SelectedCard(self._query)
-        # selected_adverts_first_page, selected_adverts_second_page = await self._get_selected_adverts()
-        selected_adverts_first_page, selected_adverts_second_page = ads_cards.get_card_id_selected_card()
-        list_all_adverts, positions = await self._get_list_all_adverts()
+    def get_adverts_card(self) ->list[Advert]:
+        format_query = self._format_query(self._query)
+        ads_cards = SelectedCard(format_query)
+        selected_adverts_first_page = ads_cards.get_card_id_selected_card()
         result_from_first_page = self._diff_selected_adverts_with_all_adverts(
             selected_adverts=selected_adverts_first_page,
-            all_adverts=list_all_adverts,
-            positions=positions[0]["positions"]
+            all_adverts=self._list_all_adverts,
+            positions=self._positions[0]["positions"]
         )
-        return result_from_first_page, []
+        return result_from_first_page
         # result_from_second_page = self._diff_selected_adverts_with_all_adverts(
         #     selected_adverts=selected_adverts_second_page,
         #     all_adverts=list_all_adverts,
@@ -80,17 +65,17 @@ class SearchEngineAdvert:
         # await self._session.close()
         # return result_from_first_page, result_from_second_page
 
-    async def _get_list_all_adverts(self):
-        # headers = get_headers()
-        async with httpx.AsyncClient() as client:
-            response = await client.get(
-                "https://catalog-ads.wildberries.ru/api/v5/search",
-                # headers=headers,
-                params={"keyword": self._query},
-                timeout=TIMEOUT
-            )
-            data = response.json()
-            return data.get("adverts"), data.get("pages")
+    # async def _get_list_all_adverts(self):
+    #     # headers = get_headers()
+    #     async with httpx.AsyncClient() as client:
+    #         response = await client.get(
+    #             "https://catalog-ads.wildberries.ru/api/v5/search",
+    #             # headers=headers,
+    #             params={"keyword": self._query},
+    #             timeout=TIMEOUT
+    #         )
+    #         data = response.json()
+    #         return data.get("adverts"), data.get("pages")
 
 
     @staticmethod
@@ -101,15 +86,15 @@ class SearchEngineAdvert:
             selected_adverts.append(advert.attrs.get("data-popup-nm-id"))
         return selected_adverts
 
-    @staticmethod
-    def _change_url_for_next_page(response):
-        for html in response.html:
-            url = str(html.url)
-            split_url = url.split("?")
-            params = "?page=2&" + split_url[1]
-            new_url = split_url[0] + params
-            html.url = new_url
-        return response
+    # @staticmethod
+    # def _change_url_for_next_page(response):
+    #     for html in response.html:
+    #         url = str(html.url)
+    #         split_url = url.split("?")
+    #         params = "?page=2&" + split_url[1]
+    #         new_url = split_url[0] + params
+    #         html.url = new_url
+    #     return response
 
 
  #    async def _get_selected_adverts(self) -> tuple[list, list]:
@@ -148,11 +133,11 @@ class SearchEngineAdvert:
         return result
 
 
-async def get_adverts(query: str):
-    search_engine = SearchEngineAdvert(query)
-    adverts = await search_engine.get_adverts_card()
+def get_adverts(query: str, list_adverts: list, positions: list):
+    search_engine = SearchEngineAdvert(query, list_adverts, positions)
+    adverts = search_engine.get_adverts_card()
     text = f"Ваш запрос: <b>{query}</b>\n\nПозиции и цена:\n"  # <b>1-ая страница</b>\n"
-    for advert in adverts[0]:
+    for advert in adverts:
         text += f"{advert.position} - {advert.cpm} руб.\n"  #  - Артикул: {advert.card_id}\n"
     return text
     # text += "\n<b>Вторая страница</b>\n"

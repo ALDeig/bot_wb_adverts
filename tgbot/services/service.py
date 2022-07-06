@@ -8,7 +8,7 @@ from tgbot.keyboards import kb_user
 
 from tgbot.keyboards.kb_user import unsubscribe
 from .db_queries import delete_tracking, get_all_tracking
-from .wb import errors, common, wb, ads_by_query
+from .wb import errors, common, wb, wb_selenium
 
 
 Notification = namedtuple("Notification", "user_id, text, kb")
@@ -24,7 +24,9 @@ async def send_update_price(session_factory: sessionmaker, bot: Bot):
                 try:
                     if tracking.query_text:
                         # notification_text = await wb.get_adverts_by_query_search(client, tracking.query_text)
-                        notification_text = await ads_by_query.get_adverts(tracking.query_text)
+                        adverts, positions = await wb.get_adverts_by_query_search(client, tracking.query_text)
+                        notification_text = wb_selenium.get_adverts(tracking.query_text, adverts, positions)
+                        # notification_text = await ads_by_query.get_adverts(tracking.query_text)
                     else: 
                         notification_text = await wb.get_adverts_by_scu(client, tracking.scu)
                 except errors.BadRequestInWB:
