@@ -6,3 +6,4 @@ asyncpg
 loguru
 httpx
 APScheduler
+pyQiwiP2P
