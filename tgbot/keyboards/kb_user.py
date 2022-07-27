@@ -17,6 +17,13 @@ def subscribe():
     return kb
 
 
+def pay(payment_url: str):
+    kb = InlineKeyboardMarkup(row_width=1).add(
+        InlineKeyboardButton(text="Оплатить", url=payment_url),
+    )
+    return kb
+
+
 def paid():
     kb = InlineKeyboardMarkup(row_width=1).add(
         InlineKeyboardButton(text="Оплатил(а)", callback_data="paid")

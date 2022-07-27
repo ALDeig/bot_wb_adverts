@@ -6,6 +6,10 @@ from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
  
+
+PROXY = "168.80.203.29:8000"
+
+
 class Advert(NamedTuple):
     position: int
     card_id: int
@@ -13,27 +17,38 @@ class Advert(NamedTuple):
 
 
 
-options = webdriver.ChromeOptions()
-options.add_argument("user-agent=Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:84.0) Gecko/20100101 Firefox/84.0")
-options.add_argument("--disable-blink-features=AutomationControlled")
-options.add_argument("--no-sandbox")
-options.add_argument("start-maximized")
-options.add_argument("disable-infobars")
-options.add_argument("--disable-extensions")
-options.headless = True
+# options = webdriver.ChromeOptions()
+# options.add_argument("user-agent=Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:84.0) Gecko/20100101 Firefox/84.0")
+# options.add_argument("--disable-blink-features=AutomationControlled")
+# options.add_argument("--no-sandbox")
+# options.add_argument("start-maximized")
+# options.add_argument("disable-infobars")
+# options.add_argument("--disable-extensions")
+# options.headless = True
 path_to_chromedriver = str(Path.cwd() / "chromedriver")
 
 
 class SelectedCard:
     def __init__(self, query):
+        options = webdriver.ChromeOptions()
+        options.add_argument(f"user-agent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36")
+        options.add_argument("--disable-blink-features=AutomationControlled")
+        options.add_argument("--no-sandbox")
+        options.add_argument("start-maximized")
+        options.add_argument("disable-infobars")
+        options.add_argument("--disable-extensions")
+        options.add_argument("--proxy-server=%s" % PROXY)
+        options.headless = True
         s = Service(executable_path=path_to_chromedriver)
         self.driver = webdriver.Chrome(service=s, options=options)
         self._query=urllib.parse.quote(query)
 
     def get_card_id_selected_card(self) -> list:
         self.driver.get(f"https://www.wildberries.ru/catalog/0/search.aspx?sort=popular&search={self._query}")
-        self.driver.implicitly_wait(5)
+        self.driver.implicitly_wait(6)
         cards = self.driver.find_elements(By.CSS_SELECTOR, ".advert-card-item")
+        # elem = self.driver.find_element(By.CSS_SELECTOR, "button.nav-element__geo.hide-desktop.j-geocity-link.j-wba-header-item")
+        # print(elem.text)
         result = []
         for card in cards:
             result.append(card.get_attribute("data-popup-nm-id"))

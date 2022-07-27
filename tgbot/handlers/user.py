@@ -35,19 +35,19 @@ async def user_start(msg: Message, db: AsyncSession, state: FSMContext):
     await msg.answer("Узнать ставки", reply_markup=kb_user.menu)
 
 
-async def btn_subscribe(call: CallbackQuery):
-    """Обработка команды на покупку подписки"""
-    await call.answer()
-    period = "день" if call.data == "day" else "месяц"
-    await call.message.answer(f"Вы выбрали 1 {period} подписки")
-    await call.message.answer(Texts.subscribe, reply_markup=kb_user.paid())
+# async def btn_subscribe(call: CallbackQuery):
+#     """Обработка команды на покупку подписки"""
+#     await call.answer()
+#     period = "день" if call.data == "day" else "месяц"
+#     await call.message.answer(f"Вы выбрали 1 {period} подписки")
+#     await call.message.answer(Texts.subscribe, reply_markup=kb_user.paid())
 
 
-async def paid(call: CallbackQuery):
-    """Обработка команды 'Оплатил'. """
-    await call.answer()
-    await call.message.edit_reply_markup()
-    await call.message.answer(Texts.paid, reply_markup=kb_user.menu)
+# async def paid(call: CallbackQuery):
+#     """Обработка команды 'Оплатил'. """
+#     await call.answer()
+#     await call.message.edit_reply_markup()
+#     await call.message.answer(Texts.paid, reply_markup=kb_user.menu)
 
 
 async def btn_check_price_in_search(call: CallbackQuery, db: AsyncSession, state: FSMContext):
@@ -174,8 +174,8 @@ async def btn_unsubscribe(call: CallbackQuery, db: AsyncSession):
 
 def register_user(dp: Dispatcher):
     dp.register_message_handler(user_start, commands=["start"], state="*")
-    dp.register_callback_query_handler(btn_subscribe, lambda call: call.data == "day" or call.data == "month")
-    dp.register_callback_query_handler(paid, lambda call: call.data == "paid")
+    # dp.register_callback_query_handler(btn_subscribe, lambda call: call.data == "day" or call.data == "month")
+    # dp.register_callback_query_handler(paid, lambda call: call.data == "paid")
     dp.register_callback_query_handler(btn_check_price_in_search, text="ads_in_search")
     dp.register_message_handler(get_search_query, state="get_search_query")
     dp.register_callback_query_handler(btn_check_price_in_card, text="ads_in_card")

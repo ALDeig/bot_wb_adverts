@@ -5,11 +5,13 @@ from aiogram import Bot, Dispatcher
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.types import BotCommand, BotCommandScopeChat
 from aiogram.utils.exceptions import ChatNotFound
+from pyqiwip2p import AioQiwiP2P
 
 from tgbot.config import Settings
 from tgbot.filters.admin import AdminFilter
 from tgbot.handlers.admin import register_admin
 from tgbot.handlers.user import register_user
+from tgbot.handlers.payment import register_payment
 from tgbot.middlewares.db import DbMiddleware
 from tgbot.services.db_connection import create_session_factory
 from tgbot.services.logger import setup_logger
@@ -26,6 +28,7 @@ def register_all_filters(dp):
 
 def register_all_handlers(dp):
     register_admin(dp)
+    register_payment(dp)
     register_user(dp)
 
 
@@ -70,9 +73,11 @@ async def main():
 
     bot = Bot(token=config.tg.token, parse_mode='HTML')
     dp = Dispatcher(bot, storage=storage)
+    qiwi = AioQiwiP2P(auth_key=config.tg.qiwi_token)
 
     bot['config'] = config
     bot["session_factory"] = session_factory = create_session_factory(database_url)
+    bot["qiwi"] = qiwi
     bot.set_current(bot)
     bot_info = await bot.get_me()
     logging.info(f'<yellow>Name: <b>{bot_info["first_name"]}</b>, username: {bot_info["username"]}</yellow>')

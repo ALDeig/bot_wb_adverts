@@ -11,6 +11,7 @@ class TgBot(DefaultConfig):
     token: str
     admins: list[int]
     use_redis: bool
+    qiwi_token: str
 
 
 class DbConfig(DefaultConfig):
