@@ -6,4 +6,5 @@ asyncpg
 loguru
 httpx
 APScheduler
-pyQiwiP2P
+pyQiwiP2P==2.0.3
+selenium
