@@ -66,7 +66,7 @@ async def get_search_query(msg: Message, state: FSMContext):
     await state.finish()
     try:
         headers = common.get_headers()
-        async with AsyncClient(headers=headers, timeout=common.TIMEOUT) as client:
+        async with AsyncClient(headers=headers, timeout=common.TIMEOUT, proxies="http://109.172.112.47:45785") as client:
             adverts, positions = await wb.get_adverts_by_query_search(client, msg.text.lower())
     except errors.BadRequestInWB:
         await msg.answer("Не удалось обработать запрос. Возможно неверный поисковый запрос")

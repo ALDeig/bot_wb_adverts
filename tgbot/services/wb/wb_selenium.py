@@ -7,7 +7,7 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
  
 
-PROXY = "168.80.203.29:8000"
+PROXY = "109.172.112.47:45785"
 
 
 class Advert(NamedTuple):
@@ -16,22 +16,12 @@ class Advert(NamedTuple):
     cpm: int
 
 
-
-# options = webdriver.ChromeOptions()
-# options.add_argument("user-agent=Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:84.0) Gecko/20100101 Firefox/84.0")
-# options.add_argument("--disable-blink-features=AutomationControlled")
-# options.add_argument("--no-sandbox")
-# options.add_argument("start-maximized")
-# options.add_argument("disable-infobars")
-# options.add_argument("--disable-extensions")
-# options.headless = True
 path_to_chromedriver = str(Path.cwd() / "chromedriver")
 
 
 class SelectedCard:
     def __init__(self, query):
         options = webdriver.ChromeOptions()
-        options.add_argument(f"user-agent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36")
         options.add_argument("--disable-blink-features=AutomationControlled")
         options.add_argument("--no-sandbox")
         options.add_argument("start-maximized")
@@ -72,26 +62,6 @@ class SearchEngineAdvert:
             positions=self._positions[0]["positions"]
         )
         return result_from_first_page
-        # result_from_second_page = self._diff_selected_adverts_with_all_adverts(
-        #     selected_adverts=selected_adverts_second_page,
-        #     all_adverts=list_all_adverts,
-        #     positions=positions[1]["positions"]
-        # )
-        # await self._session.close()
-        # return result_from_first_page, result_from_second_page
-
-    # async def _get_list_all_adverts(self):
-    #     # headers = get_headers()
-    #     async with httpx.AsyncClient() as client:
-    #         response = await client.get(
-    #             "https://catalog-ads.wildberries.ru/api/v5/search",
-    #             # headers=headers,
-    #             params={"keyword": self._query},
-    #             timeout=TIMEOUT
-    #         )
-    #         data = response.json()
-    #         return data.get("adverts"), data.get("pages")
-
 
     @staticmethod
     def _find_adverts_card_in_page(response) -> list:
@@ -100,34 +70,6 @@ class SearchEngineAdvert:
         for advert in adverts:
             selected_adverts.append(advert.attrs.get("data-popup-nm-id"))
         return selected_adverts
-
-    # @staticmethod
-    # def _change_url_for_next_page(response):
-    #     for html in response.html:
-    #         url = str(html.url)
-    #         split_url = url.split("?")
-    #         params = "?page=2&" + split_url[1]
-    #         new_url = split_url[0] + params
-    #         html.url = new_url
-    #     return response
-
-
- #    async def _get_selected_adverts(self) -> tuple[list, list]:
- #        params={"sort": "popular", "search": self._query}
- #        response = await self._session.get(
- #            "https://www.wildberries.ru/catalog/0/search.aspx",
- #            headers=HEADERS,
- #            params=params,
- #        )
- #        await response.html.arender(retries=5, sleep=1, keep_page=True, scrolldown=1)
- #        selected_adverts_from_first_page = self._find_adverts_card_in_page(response)
- #        return selected_adverts_from_first_page, []
-        # response = self._change_url_for_next_page(response)
-        # response = await self._session.get(response.html.url)
-        # await response.html.arender(retries=5, sleep=1, keep_page=True, scrolldown=3)
-        # selected_adverts_from_second_page = self._find_adverts_card_in_page(response)
-        # return selected_adverts_from_first_page, selected_adverts_from_second_page
-
 
     def _format_query(self, query):
         return "+".join(query.split())
@@ -153,7 +95,7 @@ def get_adverts(query: str, list_adverts: list, positions: list):
     adverts = search_engine.get_adverts_card()
     text = f"Ваш запрос: <b>{query}</b>\n\nПозиции и цена:\n"  # <b>1-ая страница</b>\n"
     for advert in adverts:
-        text += f"{advert.position} - {advert.cpm} руб.\n"  #  - Артикул: {advert.card_id}\n"
+        text += f"{advert.position} - {advert.cpm} руб.\n"
     return text
     # text += "\n<b>Вторая страница</b>\n"
     # for advert in adverts[1]:

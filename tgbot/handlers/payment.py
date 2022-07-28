@@ -11,8 +11,8 @@ async def btn_subscribe(call: CallbackQuery, state: FSMContext):
     qiwi = call.bot.get("qiwi")
     period = "день" if call.data == "day" else "месяц"
     payment = Payment(
-        amount=500 if call.data == "day" else 1900,
-        comment=f"Один {period} подписки на SEO-бота",
+        amount=900 if call.data == "day" else 2900,
+        comment=f"Один {period} подписки на бота с рекламными ставками WB",
         period=1 if call.data == "day" else 30,
         qiwi=qiwi
     )

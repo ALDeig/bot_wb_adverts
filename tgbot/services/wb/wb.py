@@ -19,9 +19,6 @@ async def get_adverts_by_query_search(client: httpx.AsyncClient, query: str) -> 
     except (KeyError, IndexError, TypeError, JSONDecodeError):
         raise BadRequestInWB
     return adverts, pages
-    # adverts = _parse_adverts_to_positions(result, positions)
-    # text = _create_text_message_by_query_search(query, adverts)
-    # return text
 
 
 async def get_adverts_by_scu(client: httpx.AsyncClient, scu: str) -> str:
@@ -55,27 +52,4 @@ def _create_text_message_by_group_ads_card(prices_with_position: dict[int,list],
         else:
             text += f"\nПозиция {position[0]}: {price}"
     return text
-
-
-# def _parse_adverts_to_positions(all_ads_card: dict, positions: list[int]):
-#     adverts = []
-#     for index, position in enumerate(positions):
-#         # index = position - 1 if positions[0] == 1 else position - positions[0]
-#         try:
-#             adverts.append(Price(
-#                 scu=all_ads_card["adverts"][index]["id"],
-#                 position=position,
-#                 price=all_ads_card["adverts"][index]["cpm"]
-#             ))
-#         except IndexError:
-#             raise BadRequestInWB
-#     return adverts
-
-
-# def _create_text_message_by_query_search(query_search: str, adverts: list):
-#     text_positions = "\n".join(f"{advert.position} - {advert.price} руб." for advert in adverts)
-#     text = f"Ваш запрос: <b>{query_search}</b>\n\nПозиции и цена:\n<u>{text_positions}</u>" 
-#     return text
-
-
 
