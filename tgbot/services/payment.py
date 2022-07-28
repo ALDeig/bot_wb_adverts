@@ -49,6 +49,11 @@ async def check_payment_process(user_id: int, db: AsyncSession, bot: Bot, paymen
                 subscribe = date.today() + timedelta(days=payment.period)
                 await add_user(db, user_id, payment.period)
                 await bot.send_message(user_id, f"Оплата прошла успешно. Ваша подписка активна до {subscribe}")
+                await bot.send_message(
+                    user_id,
+                    "Инструкции\n\nhttps://t.me/robo_wb/273\n\nhttps://t.me/robo_wb/200\n\nhttps://t.me/c/1704781355/2725\n\n\nВидео https://t.me/robo_wb/581",
+                    disable_web_page_preview=True
+                )
                 # await bot.send_message(user_id, "https://t.me/robo_wb/573 - инструкция")
                 await bot.send_message(user_id, "Выберите команду", reply_markup=menu)
                 return

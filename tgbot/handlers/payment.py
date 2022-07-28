@@ -21,6 +21,7 @@ async def btn_subscribe(call: CallbackQuery, state: FSMContext):
     session_factory = call.bot.get("session_factory")
     await call.message.answer(f"Вы выбрали 1 {period} подписки. Для перехода к окну оплаты, нажмите \"Оплатить\".",
                               reply_markup=kb_user.pay(payment_url))
+    await call.message.answer("Подтверждение оплаты занимает до 5 минут")
     async with session_factory() as session:
         await check_payment_process(call.from_user.id, session, call.bot, payment)
 
