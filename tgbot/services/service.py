@@ -23,9 +23,10 @@ async def send_update_price(session_factory: sessionmaker, bot: Bot):
             for tracking in tracking_list:
                 try:
                     if tracking.query_text:
+                        notification_text = wb_selenium.get_adverts(tracking.query_text)  # , adverts, positions)
                         # notification_text = await wb.get_adverts_by_query_search(client, tracking.query_text)
-                        adverts, positions = await wb.get_adverts_by_query_search(client, tracking.query_text)
-                        notification_text = wb_selenium.get_adverts(tracking.query_text, adverts, positions)
+                        # adverts, positions = await wb.get_adverts_by_query_search(client, tracking.query_text)
+                        # notification_text = wb_selenium.get_adverts(tracking.query_text, adverts, positions)
                         # notification_text = await ads_by_query.get_adverts(tracking.query_text)
                     else: 
                         notification_text = await wb.get_adverts_by_scu(client, tracking.scu)
