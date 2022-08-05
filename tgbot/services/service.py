@@ -19,7 +19,7 @@ async def send_update_price(session_factory: sessionmaker, bot: Bot):
         tracking_list = await get_all_tracking(session)
         users = set(tracking.user_id for tracking in tracking_list)
         list_notifications = []
-        async with AsyncClient(headers=common.get_headers(), timeout=common.TIMEOUT, proxies="http://109.172.112.47:45785") as client:
+        async with AsyncClient(headers=common.get_headers(), timeout=common.TIMEOUT, proxies="http://109.172.113.33:45785") as client:
             for tracking in tracking_list:
                 try:
                     if tracking.query_text:
