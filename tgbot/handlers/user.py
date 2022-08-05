@@ -64,15 +64,15 @@ async def btn_check_price_in_search(call: CallbackQuery, db: AsyncSession, state
 async def get_search_query(msg: Message, state: FSMContext):
     """Получает поисковый запрос для проверки цены на рекламу"""
     await state.finish()
-    try:
-        headers = common.get_headers()
-        async with AsyncClient(headers=headers, timeout=common.TIMEOUT, proxies="http://109.172.112.47:45785") as client:
-            adverts, positions = await wb.get_adverts_by_query_search(client, msg.text.lower())
-    except errors.BadRequestInWB:
-        await msg.answer("Не удалось обработать запрос. Возможно неверный поисковый запрос")
-        await state.finish()
-        return
-    result = get_adverts(msg.text.lower(), adverts, positions)
+    # try:
+    #     headers = common.get_headers()
+    #     async with AsyncClient(headers=headers, timeout=common.TIMEOUT, proxies="http://109.172.112.47:45785") as client:
+    #         adverts, positions = await wb.get_adverts_by_query_search(client, msg.text.lower())
+    # except errors.BadRequestInWB:
+    #     await msg.answer("Не удалось обработать запрос. Возможно неверный поисковый запрос")
+    #     await state.finish()
+    #     return
+    result = get_adverts(msg.text.lower())  # , adverts, positions)
     kb = kb_user.subscribe_to_update_price("text")
     await msg.answer(result, reply_markup=kb)
     await msg.answer("Узнать ставки", reply_markup=kb_user.menu)

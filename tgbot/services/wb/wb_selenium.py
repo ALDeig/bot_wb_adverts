@@ -1,3 +1,4 @@
+import json
 import urllib.parse
 from typing import NamedTuple
 from pathlib import Path
@@ -7,7 +8,7 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
  
 
-PROXY = "109.172.112.47:45785"
+PROXY = "109.172.113.33:45785"
 
 
 class Advert(NamedTuple):
@@ -31,31 +32,49 @@ class SelectedCard:
         options.headless = True
         s = Service(executable_path=path_to_chromedriver)
         self.driver = webdriver.Chrome(service=s, options=options)
+        query = self._format_query(query)
         self._query=urllib.parse.quote(query)
 
-    def get_card_id_selected_card(self) -> list:
+    def get_cards(self) -> tuple:
+        selected_card = self._get_card_id_selected_card()
+        adverts, positions = self._get_all_adverts_card_with_price()
+        return selected_card, adverts, positions
+
+    def _get_card_id_selected_card(self) -> list:
         self.driver.get(f"https://www.wildberries.ru/catalog/0/search.aspx?sort=popular&search={self._query}")
         self.driver.implicitly_wait(6)
         cards = self.driver.find_elements(By.CSS_SELECTOR, ".advert-card-item")
         # elem = self.driver.find_element(By.CSS_SELECTOR, "button.nav-element__geo.hide-desktop.j-geocity-link.j-wba-header-item")
-        # print(elem.text)
         result = []
         for card in cards:
             result.append(card.get_attribute("data-popup-nm-id"))
-        self.driver.close()
+        # self.driver.close()
         return result
+
+    def _get_all_adverts_card_with_price(self) -> tuple:
+        self.driver.get(f"https://catalog-ads.wildberries.ru/api/v5/search?keyword={self._query}")
+        elem = self.driver.find_element(By.CSS_SELECTOR, "pre")
+        page_as_json = json.loads(elem.text)
+        self.driver.close()
+        return page_as_json.get("adverts"), page_as_json.get("pages")
+
+    @staticmethod
+    def _format_query(query):
+        return "+".join(query.split())
 
 
 class SearchEngineAdvert:
-    def __init__(self, query: str, list_all_adverts: list, positions: list):
+    def __init__(self, selected_cards: list, list_all_adverts: list, positions: list):
         self._list_all_adverts = list_all_adverts
         self._positions = positions
-        self._query = query
+        # self._query = query
+        self._selected_cards = selected_cards
 
     def get_adverts_card(self) ->list[Advert]:
-        format_query = self._format_query(self._query)
-        ads_cards = SelectedCard(format_query)
-        selected_adverts_first_page = ads_cards.get_card_id_selected_card()
+        # format_query = self._format_query(self._query)
+        # ads_cards = SelectedCard(format_query)
+        # selected_adverts_first_page = ads_cards.get_card_id_selected_card()
+        selected_adverts_first_page = self._selected_cards
         result_from_first_page = self._diff_selected_adverts_with_all_adverts(
             selected_adverts=selected_adverts_first_page,
             all_adverts=self._list_all_adverts,
@@ -90,8 +109,12 @@ class SearchEngineAdvert:
         return result
 
 
-def get_adverts(query: str, list_adverts: list, positions: list):
-    search_engine = SearchEngineAdvert(query, list_adverts, positions)
+def get_adverts(query: str):  # , list_adverts: list, positions: list):
+    # search_engine = SearchEngineAdvert(query, list_adverts, positions)
+    # adverts = search_engine.get_adverts_card()
+    card = SelectedCard(query)
+    selected_cards, adverts, positions = card.get_cards()
+    search_engine = SearchEngineAdvert(selected_cards, adverts, positions)
     adverts = search_engine.get_adverts_card()
     text = f"Ваш запрос: <b>{query}</b>\n\nПозиции и цена:\n"  # <b>1-ая страница</b>\n"
     for advert in adverts:
@@ -102,4 +125,14 @@ def get_adverts(query: str, list_adverts: list, positions: list):
     #     text += f"Позиция: {advert.position} - Цена: {advert.cpm} - Артикул: {advert.card_id}\n"
     # return text
     # await bot.send_message(user_id, text)
+
+
+
+def test_1(query: str):
+    card = SelectedCard(query)
+    selected_cards, adverts, positions = card.get_cards()
+    search_engine = SearchEngineAdvert(selected_cards, adverts, positions)
+    result = search_engine.get_adverts_card()
+    print(result)
+
 
