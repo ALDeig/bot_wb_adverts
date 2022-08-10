@@ -34,7 +34,7 @@ async def get_promo_code_from_user(msg: Message, db: AsyncSession, state: FSMCon
 
 async def btn_subscribe(call: CallbackQuery, db: AsyncSession):
     await call.answer()
-    await state.finish()
+    # await state.finish()
     qiwi = call.bot.get("qiwi")
     period = "день" if call.data.startswith("day") else "месяц"
     code = call.data.split(":")[-1] if len(call.data.split(":")) == 3 else None
