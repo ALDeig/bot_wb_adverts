@@ -53,6 +53,8 @@ async def check_payment_process(user_id: int, db: AsyncSession, bot: Bot, paymen
                     code = await get_promo_code(db, payment.code)
                     await increment_amount_use_code(db, payment.code)
                     await bot.send_message(code.user, "Использован ваш промокод")
+                    for admin in bot.get("config").tg.admins:
+                        await bot.send_message(admin, f"Использован промокод: {code.code}, пользователя {code.user}")
                 await bot.send_message(user_id, f"Оплата прошла успешно. Ваша подписка активна до {subscribe}")
                 await bot.send_message(
                     user_id,
