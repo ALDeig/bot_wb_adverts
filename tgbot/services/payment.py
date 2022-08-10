@@ -8,7 +8,7 @@ from pyqiwip2p.AioQiwip2p import Bill
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from tgbot.keyboards.kb_user import menu
-from tgbot.services.db_queries import add_user, increment_amount_use_code
+from tgbot.services.db_queries import add_user, increment_amount_use_code, get_promo_code
 
 
 class BillStatus(Enum):
@@ -50,7 +50,9 @@ async def check_payment_process(user_id: int, db: AsyncSession, bot: Bot, paymen
                 subscribe = date.today() + timedelta(days=payment.period)
                 await add_user(db, user_id, payment.period)
                 if payment.code is not None:
+                    code = await get_promo_code(db, payment.code)
                     await increment_amount_use_code(db, payment.code)
+                    await bot.send_message(code.user, "Использован ваш промокод")
                 await bot.send_message(user_id, f"Оплата прошла успешно. Ваша подписка активна до {subscribe}")
                 await bot.send_message(
                     user_id,
