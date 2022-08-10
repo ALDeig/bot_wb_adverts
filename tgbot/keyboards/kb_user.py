@@ -9,11 +9,23 @@ menu = InlineKeyboardMarkup(row_width=1).add(
 )
 
 
-def subscribe():
+# def subscribe():
+#     kb = InlineKeyboardMarkup(row_width=1).add(
+#         InlineKeyboardButton(text="1 день 900р", callback_data="day"),
+#         InlineKeyboardButton(text="1 месяц 2900р", callback_data="month")
+#     )
+#     return kb
+
+
+def subscribe(price_month: int, price_day: int, code: str = "", with_promo_code: bool = True):
     kb = InlineKeyboardMarkup(row_width=1).add(
-        InlineKeyboardButton(text="1 день 900р", callback_data="day"),
-        InlineKeyboardButton(text="1 месяц 2900р", callback_data="month")
+        InlineKeyboardButton(text=f"1 день {price_day}р",
+                             callback_data=f"day:{price_day}" + (f":{code}" if code else "")),
+        InlineKeyboardButton(text=f"1 месяц {price_month}р",
+                             callback_data=f"month:{price_month}" + (f":{code}" if code else "")),
     )
+    if with_promo_code:
+        kb.add(InlineKeyboardButton(text="Ввести промокод", callback_data="promo_code"))
     return kb
 
 

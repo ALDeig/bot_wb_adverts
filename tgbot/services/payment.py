@@ -8,7 +8,7 @@ from pyqiwip2p.AioQiwip2p import Bill
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from tgbot.keyboards.kb_user import menu
-from tgbot.services.db_queries import add_user
+from tgbot.services.db_queries import add_user, increment_amount_use_code
 
 
 class BillStatus(Enum):
@@ -23,12 +23,13 @@ RELATION_STATUS = {"REJECTED": BillStatus.REJECTED, "WAITING": BillStatus.WAITIN
 
 
 class Payment:
-    def __init__(self, amount: int, period: int, comment: str, qiwi: AioQiwiP2P):
+    def __init__(self, amount: int, period: int, comment: str, qiwi: AioQiwiP2P, code: str | None):
         self._amount = amount
         # self._user_id = user_id
         self._qiwi = qiwi
         self._comment = comment
         self.period = period
+        self.code = code
         self.bill: Bill | None = None
 
     async def create_bill(self) -> str:
@@ -48,6 +49,8 @@ async def check_payment_process(user_id: int, db: AsyncSession, bot: Bot, paymen
             case BillStatus.PAID:
                 subscribe = date.today() + timedelta(days=payment.period)
                 await add_user(db, user_id, payment.period)
+                if payment.code is not None:
+                    await increment_amount_use_code(db, payment.code)
                 await bot.send_message(user_id, f"Оплата прошла успешно. Ваша подписка активна до {subscribe}")
                 await bot.send_message(
                     user_id,

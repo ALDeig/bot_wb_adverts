@@ -14,6 +14,11 @@ class TgBot(DefaultConfig):
     qiwi_token: str
 
 
+class Payment(DefaultConfig):
+    price_month: int
+    price_day: int
+
+
 class DbConfig(DefaultConfig):
     password: str
     user: str
@@ -27,3 +32,4 @@ class DbConfig(DefaultConfig):
 class Settings(BaseSettings):
     tg: TgBot = TgBot()
     db: DbConfig = DbConfig()
+    pay: Payment = Payment()

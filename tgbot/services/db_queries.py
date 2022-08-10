@@ -5,7 +5,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError, DBAPIError
 from sqlalchemy.orm.session import sessionmaker
 
-from tgbot.models.tables import User, Tracking
+from tgbot.models.tables import User, Tracking, PromoCode
+from tgbot.services.exceptions import CantAddPromoCode
 
 
 async def add_new_tracking(session: AsyncSession, user_id: int, query_text: str = None, scu: int = None):
@@ -88,3 +89,32 @@ async def get_tracking_by_user_id(session: AsyncSession, user_id: int) -> list[T
     tracking = await session.execute(sa.select(Tracking).where(Tracking.user_id == user_id))
     return tracking.scalars().all()
 
+
+async def get_promo_code(session: AsyncSession, code: str) -> PromoCode | None:
+    code = await session.execute(sa.select(PromoCode).where(PromoCode.code == code))
+    return code.scalar()
+
+
+async def add_promo_code(session: AsyncSession, code: str, user: int, discount_size: int):
+    session.add(PromoCode(code=code, user=user, amount_use=0, discount_size=discount_size))
+    try:
+        await session.commit()
+    except IntegrityError:
+        await session.rollback()
+        raise CantAddPromoCode
+
+
+async def get_all_promo_code(session: AsyncSession) -> list[PromoCode]:
+    codes = await session.execute(sa.select(PromoCode))
+    return codes.scalars().all()
+
+
+async def delete_promo_code(session: AsyncSession, code: str):
+    await session.execute(sa.delete(PromoCode).where(PromoCode.code == code))
+    await session.commit()
+
+
+async def increment_amount_use_code(session: AsyncSession, code: str):
+    await session.execute(sa.update(PromoCode).where(PromoCode.code == code)
+                               .values({"amount_use": PromoCode.amount_use + 1}))
+    await session.commit()

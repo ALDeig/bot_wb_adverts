@@ -48,6 +48,9 @@ async def set_commands(dp: Dispatcher):
         BotCommand("delete_user", "Удалить пользователя"),
         # BotCommand("my_tracking", "Мои отслеживания"),
         # BotCommand("delete_tracking", "Удалить отслеживание"),
+        BotCommand("add_promo_code", "Добавить промокод"),
+        BotCommand("get_promo_codes", "Посмотреть все промокоды"),
+        BotCommand("delete_promo_code", "Удалить промокод")
     ]
     for admin_id in admin_ids:
         try:

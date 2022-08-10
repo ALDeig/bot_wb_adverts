@@ -19,3 +19,11 @@ class Tracking(Base):
     user_id = sa.Column(sa.ForeignKey("users.id", ondelete="CASCADE"))
     query_text = sa.Column(sa.String, unique=False, nullable=True)
     scu = sa.Column(sa.Integer, unique=False, nullable=True)
+
+
+class PromoCode(Base):
+    __tablename__ = "promo_code"
+    code = sa.Column(sa.String, primary_key=True)
+    user = sa.Column(sa.ForeignKey("users.id", ondelete="CASCADE"))
+    amount_use = sa.Column(sa.Integer)
+    discount_size = sa.Column(sa.Integer)

@@ -23,6 +23,7 @@ async def user_start(msg: Message, db: AsyncSession, state: FSMContext):
     await state.finish()
     user = await db_queries.get_user(db, msg.from_user.id)
     if not user:
+        config = msg.bot.get("config")
         # images = [InputMediaPhoto(InputFile("images/1.jpg")), InputMediaPhoto(InputFile("images/2.jpg"))]
         images = [
             InputMediaPhoto("AgACAgIAAxkDAAIgsmKDfZ7b8guXaHGMQGyfU9T3_E1uAAK6ujEbViEZSCve-ONW0q7HAQADAgADeQADJAQ"),
@@ -30,7 +31,7 @@ async def user_start(msg: Message, db: AsyncSession, state: FSMContext):
         ]
         await msg.answer(Texts.start)
         await msg.answer_media_group(images)
-        await msg.answer("Оформить подписку", reply_markup=kb_user.subscribe())
+        await msg.answer("Оформить подписку", reply_markup=kb_user.subscribe(config.pay.price_month, config.pay.price_day))
         return
     await msg.answer("Узнать ставки", reply_markup=kb_user.menu)
 
