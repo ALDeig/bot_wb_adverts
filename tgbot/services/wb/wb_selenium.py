@@ -8,7 +8,7 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
  
 
-PROXY = "109.172.113.33:45785"
+PROXY = "109.172.114.4:45785"
 
 
 class Advert(NamedTuple):

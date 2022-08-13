@@ -26,7 +26,7 @@ async def get_promo_code_from_user(msg: Message, db: AsyncSession, state: FSMCon
         text="Оплатить подписку",
         reply_markup=kb_user.subscribe(
             price_month=int(config.pay.price_month - (config.pay.price_month * (code.discount_size / 100))),
-            price_day=int(config.pay.price_day - (config.pay.price_day * (code.discount_size / 100))),
+            price_day=config.pay.price_day,
             code=code.code,
             with_promo_code=False
         )
@@ -73,6 +73,6 @@ async def btn_subscribe(call: CallbackQuery, db: AsyncSession):
 def register_payment(dp: Dispatcher):
     dp.register_callback_query_handler(btn_promo_code, text="promo_code")
     dp.register_message_handler(get_promo_code_from_user, state="get_promo_code_from_user")
-    dp.register_callback_query_handler(btn_subscribe, text_contains="day" or "month")
-    # dp.register_callback_query_handler(btn_subscribe, lambda call: call.data == "day" or call.data == "month")
+    # dp.register_callback_query_handler(btn_subscribe, text_contains=("month" or "day"))
+    dp.register_callback_query_handler(btn_subscribe, lambda call: call.data.startswith("day") or call.data.startswith("month"))
 
