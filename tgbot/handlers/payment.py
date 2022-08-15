@@ -73,6 +73,6 @@ async def btn_subscribe(call: CallbackQuery, db: AsyncSession):
 def register_payment(dp: Dispatcher):
     dp.register_callback_query_handler(btn_promo_code, text="promo_code")
     dp.register_message_handler(get_promo_code_from_user, state="get_promo_code_from_user")
-    # dp.register_callback_query_handler(btn_subscribe, text_contains=("month" or "day"))
-    dp.register_callback_query_handler(btn_subscribe, lambda call: call.data.startswith("day") or call.data.startswith("month"))
+    dp.register_callback_query_handler(btn_subscribe, text_startswith=["month", "day"])
+    # dp.register_callback_query_handler(btn_subscribe, lambda call: call.data.startswith("day") or call.data.startswith("month"))
 
